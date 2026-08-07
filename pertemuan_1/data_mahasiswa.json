@@ -22,5 +22,11 @@
         "nim": "202323234",
         "nama": "Siapa",
         "jurusan": "Teknik informatika"
+    },
+    {
+        "id": 5,
+        "nim": "2511500047",
+        "nama": "Fika Haliza",
+        "jurusan": "Teknik Informatika"
     }
 ]

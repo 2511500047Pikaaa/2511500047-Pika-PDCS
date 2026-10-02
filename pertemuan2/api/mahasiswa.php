@@ -3,6 +3,7 @@
 require_once "../config.php";
 require_once "../helpers/response.php";
 
+//GET by ID
 if (isset($_GET['id'])) {
     $id = $_GET['id']; 
 
@@ -25,4 +26,72 @@ if (!$data) {
 
 sendResponse(true, "Berhasil", $data, 200);
 }
-?>
+
+//search
+if (isset($_GET['search'])) {
+
+    $search = $_GET['search'];
+
+    $q = "SELECT m.id, m.nama, m.nim, j.nama_jurusan AS jurusan
+          FROM mahasiswa m
+          LEFT JOIN jurusan j
+            ON m.jurusan_id = j.id
+          WHERE m.nama LIKE '%$search%'
+            OR m.nim LIKE '%$search%'
+          ORDER BY m.id DESC";
+
+    $r = mysqli_query($koneksi, $q);
+
+    $data = [];
+
+    while ($row = mysqli_fetch_assoc($r)) {
+        $data[] = $row;
+    }
+
+sendResponse(true, "Berhasil", $data, 200); 
+}
+
+//pagenation
+if(isset($_GET['page']) || isset($_GET['limit'])) {
+
+    $page = isset($_GET['page'])
+        ? (int) $_GET['page']
+        : 1;
+
+    $limit = isset($_GET['limit'])
+        ? (int) $_GET['limit']
+        : 10;
+
+    if ($page < 1) {
+        $page = 1;
+    }
+
+    if ($limit < 1) {
+        $limit = 10;
+    }
+
+    $offset = ($page - 1) * $limit;
+
+    $q = "SELECT m.id, m.nama, j.nama_jurusan AS jurusan
+          FROM mahasiswa m
+          LEFT JOIN jurusan j
+            ON m.jurusan_id = j.id
+          ORDER BY m.id DESC
+          LIMIT $limit OFFSET $offset";
+
+    $r = mysqli_query($koneksi, $q);
+
+    if (!$r) (
+        sendResponse(
+            false, "Query Gagal: " . mysqli_error($koneksi), null, 500
+        )
+    );
+
+    $data = [];
+
+    while ($row = mysqli_fetch_assoc($r)) {
+        $data[] = $row;
+    }
+
+    sendResponse(true, "Berhasil", $data, 200); 
+}

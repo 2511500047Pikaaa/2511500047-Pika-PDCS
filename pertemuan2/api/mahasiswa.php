@@ -3,10 +3,15 @@
 require_once "../config.php";
 require_once "../helpers/response.php";
 
-//GET by ID
-if (isset($_GET['id'])) {
-    $id = $_GET['id']; 
+$method = $_SERVER['REQUEST_METHOD'];
 
+//pertemuan4
+//GET BY ID
+switch ($method) {
+    case 'GET':
+       if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    
 $q = "SELECT m.id, m.nama, m.nim, j.nama_jurusan AS jurusan
       FROM mahasiswa m
       LEFT JOIN jurusan j ON m.jurusan_id = j.id
@@ -92,6 +97,12 @@ if(isset($_GET['page']) || isset($_GET['limit'])) {
     while ($row = mysqli_fetch_assoc($r)) {
         $data[] = $row;
     }
-
+}
     sendResponse(true, "Berhasil", $data, 200); 
+
+break;
+
+    default:
+        sendResponse(false, "Method tidak didukung", null, 405);
+        break;
 }
